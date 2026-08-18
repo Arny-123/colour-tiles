@@ -1,13 +1,14 @@
 extends Node2D
 @onready var grid = $GridContainer
 
-var spawn_interval = 1.8
-var forbidden_colour = Color.BLUE
+var lives
 var correct_taps = 0
-var target_taps = 5
-var lives = 3
+var game_active = true
+var current_level
 
 func _ready():
+	current_level = create_level(1)
+	lives = current_level.lives
 	create_grid()
 	start_spawning()
 
@@ -32,26 +33,47 @@ func show_random_tile():
 		return
 
 	var random_tile = available_tiles.pick_random()
-	var colours = [Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW]
+	var colours = current_level.available_colours
 	random_tile.light_up(colours.pick_random())
 
-	await get_tree().create_timer(1.5).timeout
+	await get_tree().create_timer(current_level.tile_duration).timeout
 	random_tile.turn_grey()
 
 func start_spawning():
-	while true:
+	while game_active:
 		show_random_tile()
-		await get_tree().create_timer(spawn_interval).timeout
-
+		await get_tree().create_timer(current_level.spawn_interval).timeout
 
 func _on_tile_clicked(tile):
-	if tile.current_colour == forbidden_colour:
-		print("WRONG!")
+	if tile.current_colour == current_level.forbidden_colour:
+		lives -= 1
+		print("WRONG! Lives left: ", lives)
+
+		if lives <= 0:
+			game_active = false
+			print("GAME OVER!")
+
 	else:
-		print("CORRECT!")
 		correct_taps += 1
-		print(correct_taps)
+		print("Correct taps: ", correct_taps)
+
+		if correct_taps >= current_level.target_taps:
+			game_active = false
+			print("LEVEL COMPLETE!")
+
 	tile.turn_grey()
-	if correct_taps >= target_taps:
-		print("LEVEL COMPLETE!")
+
+func create_level(level_number):
+	if level_number == 1:
+		return Level.new(
+			1,
+			5,
+			3,
+			1.7,
+			1.5,
+			[Color.RED, Color.BLUE],
+			Color.BLUE,
+			0,
+			false
+		)
 	
