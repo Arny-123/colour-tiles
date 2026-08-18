@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://l3duhsn615cu"]
+
+[ext_resource type="Script" uid="uid://c6dmhi5saxrc4" path="res://main.gd" id="1_ig7tw"]
+
+[node name="Node2D" type="Node2D" unique_id=1258630182]
+script = ExtResource("1_ig7tw")
+
+[node name="GridContainer" type="GridContainer" parent="." unique_id=1286840908]
+offset_right = 600.0
+offset_bottom = 600.0
+columns = 6
